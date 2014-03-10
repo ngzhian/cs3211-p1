@@ -18,7 +18,7 @@ public class Atm extends Thread {
 	private void withdrawAmount(Integer amount) {
 		try (Socket puConnection = new Socket("localhost", Globals.atmToNetwork)) {
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(puConnection.getOutputStream()));
-			writer.write(amount.toString());
+			writer.write("withdraw " + this.account + " " + amount.toString());
 		} catch (IOException e) {
 			// The connection failed.
 			System.out.println(e.getMessage());
