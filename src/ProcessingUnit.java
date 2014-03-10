@@ -29,7 +29,7 @@ public class ProcessingUnit extends Thread {
     complete = false;
     success = false;
 
-    try (Socket socket = new Socket("localhost", Main.port);
+    try (Socket socket = new Socket("localhost", Globals.port);
         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(
             socket.getInputStream()));
         PrintWriter outToServer = new PrintWriter(socket.getOutputStream(),

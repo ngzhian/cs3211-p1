@@ -1,16 +1,14 @@
 import java.util.Scanner;
 
 public class Main {
-  static int port;
-
   public static void main(String[] args) {
     System.out.println("Main start");
-    port = 3342;
+    Globals.port = 3342;
     if (args.length > 0) {
       try {
-        port = Integer.parseInt(args[0]);
+        Globals.port = Integer.parseInt(args[0]);
       } catch (NumberFormatException e) {
-        System.out.println("Using port " + port);
+        System.out.println("Using port " + Globals.port);
       }
     }
 
@@ -27,7 +25,7 @@ public class Main {
     Integer expected = 30;
     Integer withdrawA = 30;
     Integer withdrawB = 40;
-    Database db = new Database(port, 2);
+    Database db = new Database(Globals.port, 2);
     Database.setDefaultBalance();
     db.start();
     System.out.println("Starting test 1");
@@ -64,7 +62,7 @@ public class Main {
     System.out.print("No. of accounts the database should support: ");
     Integer numAccounts = sc.nextInt();
 
-    Database db = new Database(port, numAccounts);
+    Database db = new Database(Globals.port, numAccounts);
     System.out.println("Want to specify account balance for each account? Y/N");
     System.out.println("If N, balance is set to 100 for all");
     String specify = sc.next();
