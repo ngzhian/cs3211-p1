@@ -1,71 +1,48 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class ProcessingWorker extends Thread {
-	private int account;
-	int withdrawAmount;
-	private boolean complete;
-	private boolean success;
+	Socket socket;
 
-	public ProcessingWorker(int account) {
-		this.account = account;
-	}
-
-	public void setWithdrawAmount(int amount) {
-		this.withdrawAmount = amount;
+	public ProcessingWorker(Socket socket) {
+		this.socket = socket;
 	}
 
 	@Override
 	public void run() {
-		complete = false;
-		success = false;
+		handleRequest();
+	}
 
-		try (Socket socket = new Socket("localhost", Globals.port);
-				BufferedReader inFromServer = new BufferedReader(
-						new InputStreamReader(socket.getInputStream()));
-				PrintWriter outToServer = new PrintWriter(
-						socket.getOutputStream(), true);) {
-			String inputLine;
+	private void handleRequest() {
+		BufferedReader requestReader;
+		try {
+			requestReader = new BufferedReader(new InputStreamReader(
+					this.socket.getInputStream()));
+		} catch (IOException e) {
+			System.out
+					.println("CRITICAL ERROR: Couldn't get input stream in Processing Unit.");
+			throw new RuntimeException();
+		}
 
-			String command = "withdraw " + account + " " + withdrawAmount;
-			System.out.println("PU issues command:" + command);
-			outToServer.println(command);
-			while ((inputLine = inFromServer.readLine()) != null) {
-				System.out.println("PU receives feedback:" + inputLine);
-				switch (inputLine) {
-				case "end":
-					break;
-				case "success":
-					success = true;
-					break;
-				case "fail":
-					success = false;
-					break;
-				}
-				// notify the database that ProcessingUnit wishes to end
-				// transaction
-				outToServer.println("end");
-				break;
+		try (Socket sendToDb = new Socket("localhost", Globals.puToNetwork);
+				BufferedReader responseFromDb = new BufferedReader(
+						new InputStreamReader(sendToDb.getInputStream()));
+				BufferedWriter outToDb = new BufferedWriter(
+						new OutputStreamWriter(sendToDb.getOutputStream()))) {
+			String line;
+			while ((line = requestReader.readLine()) != null) {
+				outToDb.write(line);
 			}
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		complete = true;
-	}
-
-	public boolean isCompleted() {
-		return complete;
-	}
-
-	public boolean hasFailed() {
-		return !success;
 	}
 }
