@@ -3,13 +3,15 @@ import java.util.Scanner;
 public class Main {
   public static void main(String[] args) {
     System.out.println("Main start");
-    Globals.port = 3342;
+    
     if (args.length > 0) {
       try {
         Globals.port = Integer.parseInt(args[0]);
       } catch (NumberFormatException e) {
         System.out.println("Using port " + Globals.port);
       }
+    } else {
+    	Globals.port = 3342;
     }
 
     // interactive();
