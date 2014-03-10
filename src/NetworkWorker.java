@@ -3,6 +3,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 public class NetworkWorker extends Thread {
@@ -28,14 +29,15 @@ public class NetworkWorker extends Thread {
 		}
 
 		try (Socket sendTo = new Socket("localhost", this.sendPortNum)) {
-			BufferedWriter outToReceiver = new BufferedWriter(
-					new OutputStreamWriter(sendTo.getOutputStream()));
+			PrintWriter outToReceiver = new PrintWriter(
+					sendTo.getOutputStream(), true);
 
 			String lineFromSender;
 			while ((lineFromSender = inFromSender.readLine()) != null) {
-				outToReceiver.write(lineFromSender);
+				outToReceiver.println(lineFromSender);
 			}
 		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }

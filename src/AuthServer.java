@@ -34,15 +34,14 @@ class AuthServerThread extends Thread {
 
 	@Override
 	public void run() {
-		try (PrintWriter serverOut = new PrintWriter(socket.getOutputStream(),true);
-			 BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));) {
-			
-			boolean isValid = inFromClient.read() < Globals.accountNumber;
-			if(isValid){
-				serverOut.println("success");
-			} else{
-				serverOut.println("invalid account");
-			}
+		try (PrintWriter serverOut = new PrintWriter(socket.getOutputStream(),
+				true);
+				BufferedReader inFromClient = new BufferedReader(
+						new InputStreamReader(socket.getInputStream()));) {
+
+			boolean isValid = Integer.parseInt(inFromClient.readLine()) < Globals.accountNumber;
+			String message = isValid ? "success" : "invalid account";
+			serverOut.println(message);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

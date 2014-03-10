@@ -5,6 +5,12 @@ public class Main {
 		setUpNetwork(reliability);
 		setUpDatabase();
 
+		ProcessingUnit pu = new ProcessingUnit();
+		pu.start();
+
+		AuthServer auth = new AuthServer();
+		auth.start();
+
 		runTest();
 	}
 
@@ -12,8 +18,10 @@ public class Main {
 		Atm first = new Atm();
 		Atm second = new Atm();
 
-		first.login(0);
-		second.login(0);
+//		first.login(0);
+//		second.login(0);
+		first.account = 0;
+		second.account = 0;
 
 		Integer withdrawA = 30;
 		Integer withdrawB = 40;
@@ -29,7 +37,7 @@ public class Main {
 
 		first.start();
 		second.start();
-
+		
 		System.out.println("Final balance should be " + expected);
 		Integer actual = Database.getBalance(0);
 		if (actual == expected) {
@@ -53,7 +61,10 @@ public class Main {
 				Globals.networkToPu, reliability);
 		Network puToDb = new Network(Globals.puToNetwork, Globals.networkToDb,
 				reliability);
+		Network atmToAuth = new Network(Globals.atmToAuthNetwork,
+				Globals.authNetworkToAuthServer, reliability);
 		atmToPu.start();
 		puToDb.start();
+		atmToAuth.start();
 	}
 }
