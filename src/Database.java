@@ -134,8 +134,8 @@ class DatabaseThread extends Thread {
 			e.printStackTrace();
 		}
 
-		System.out.printf("After all %d has %d\n", 0, Database.getBalance(0));
-		System.out.printf("After all %d has %d\n", 1, Database.getBalance(1));
+		System.out.printf("Current balance for account %d: %d\n", 0, Database.getBalance(0));
+		System.out.printf("Current balance for account %d: %d\n", 1, Database.getBalance(1));
 	}
 
 }

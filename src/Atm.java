@@ -9,7 +9,7 @@ public class Atm extends Thread {
 	Integer amount;
 
 	public void login(Integer account) {
-		String outputPrefix = "ATM " + Thread.currentThread().getId();
+		String outputPrefix = "ATM " + this.getId();
 		System.out.println(outputPrefix + ": Logging in...");
 		try (Socket connection = new Socket("localhost", Globals.atmToAuthPort);
 				PrintWriter outToAuth = new PrintWriter(connection.getOutputStream(), true);
@@ -33,7 +33,7 @@ public class Atm extends Thread {
 			System.out.println(outputPrefix + ": Login failed. Retrying.");
 			login(account);
 		} catch (NullPointerException e) {
-			System.out.println("ATM " + Thread.currentThread().getId() + ": Deadlocked while logging in!");
+			System.out.println("ATM " + this.getId() + ": Deadlocked while logging in!");
 		}
 	}
 
