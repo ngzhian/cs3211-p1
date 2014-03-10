@@ -22,6 +22,7 @@ public class Atm extends Thread {
 		} catch (IOException e) {
 			// The connection failed.
 			System.out.println(e.getMessage());
+			withdrawAmount(amount);
 		} 
 	}
 
