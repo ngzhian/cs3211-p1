@@ -55,7 +55,7 @@ public class Database extends Thread {
 	 * @return true on successful withdraw, false on error, e.g. amount to
 	 * withdraw more than balance
 	 */
-	public static boolean processWithdraw(String input) {
+	public static synchronized boolean processWithdraw(String input) {
 		String[] tokens = input.split(" ");
 		Integer account = Integer.parseInt(tokens[1]);
 		Integer amount = Integer.parseInt(tokens[2]);
@@ -95,8 +95,7 @@ class DatabaseThread extends Thread {
 				BufferedReader inFromPu = new BufferedReader(new InputStreamReader(socket.getInputStream()));) {
 			if (Globals.isTimeout()) {
 				inFromPu.readLine();
-				outToPu.write("timeout");
-				inFromPu.readLine();
+				outToPu.println("timeout");
 			} else {
 				String inputLine = inFromPu.readLine();
 				if (inputLine.contains("withdraw")) {

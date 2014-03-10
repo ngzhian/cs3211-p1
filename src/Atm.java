@@ -47,15 +47,13 @@ public class Atm extends Thread {
 			outToPu.println(withdrawRequest);
 			
 			String response = inFromPu.readLine();
-			while (response == "timeout") {
-				outToPu.write("ACK");
-				outToPu.write(withdrawRequest);
-				response = inFromPu.readLine();
+			if (response.equals("timeout")) {
+				throw new IOException();
 			}
 			System.out.println(response);
 		} catch (IOException e) {
 			// The connection failed.
-			System.out.println(e.getMessage());
+			System.out.println("Connection to PU failed. Retrying.");
 			withdrawAmount(amount);
 		}
 	}

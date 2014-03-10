@@ -36,7 +36,7 @@ class AuthServerThread extends Thread {
 		try (BufferedReader inFromAtm = new BufferedReader(new InputStreamReader(client.getInputStream()));
 				PrintWriter outToAtm = new PrintWriter(client.getOutputStream(), true);) {
 			if (Globals.isTimeout()) {
-				outToAtm.write("timeout");
+				outToAtm.println("timeout");
 				return;
 			}
 

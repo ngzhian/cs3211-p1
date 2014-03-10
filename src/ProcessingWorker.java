@@ -22,11 +22,14 @@ public class ProcessingWorker extends Thread {
 				BufferedReader inFromAtm = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				PrintWriter outToAtm = new PrintWriter(socket.getOutputStream(), true);
 				) {
-			// TODO: timeout from ATM to PU.	
 			String requestFromAtm = inFromAtm.readLine();
-			
-			String responseFromDb = getResponseFromDb(requestFromAtm);
-			outToAtm.write(responseFromDb);
+
+			if (Globals.isTimeout()) {
+				outToAtm.println("timeout");
+			} else {
+				String responseFromDb = getResponseFromDb(requestFromAtm);
+				outToAtm.println(responseFromDb);
+			}
 		} catch (IOException e) {
 			
 		}
@@ -41,7 +44,6 @@ public class ProcessingWorker extends Thread {
 		outToDb.println(requestFromAtm);
 		String responseFromDb = inFromDb.readLine();
 		if (responseFromDb == "timeout") {
-			outToDb.println("ACK");
 			dbConnection.close();
 			inFromDb.close();
 			outToDb.close();

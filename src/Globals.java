@@ -1,7 +1,7 @@
 import java.util.Random;
 
 public class Globals {
-	static int reliability = 100;
+	static int reliability = 50;
 	static int numberOfAccounts = 10;
 
 	static int atmToAuthPort = 1000;
