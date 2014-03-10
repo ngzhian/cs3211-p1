@@ -24,11 +24,8 @@ public class Main {
 		// testOne();
 		int reliability = 100;
 		
-		Network atmToPu = new Network(Globals.atmSendPort, Globals.puReceiveAtmPort, reliability);
-		Network puToAtm = new Network(Globals.puReplyAtmPort, Globals.atmReceivePort, reliability);
-		Network puToDb = new Network(Globals.puSendPort, Globals.dbReceivePort, reliability);
-		Network dbToPu = new Network(Globals.dbSendPort, Globals.puReceiveDbPort, reliability);
-		
+		Network atmToPu = new Network(Globals.atmToNetwork, Globals.networkToPu, reliability);
+		Network puToDb = new Network(Globals.puToNetwork, Globals.networkToDb, reliability);
 	}
 
 	private static void testOne() {
