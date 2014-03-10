@@ -1,33 +1,36 @@
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+
 public class Atm extends Thread {
-  Integer account;
-  Integer amount;
+	Integer account;
+	Integer amount;
 
-  public Atm login(Integer account) {
-    this.account = account;
-    return this;
-  }
+	public void login(Integer account) {
+		this.account = account;
+	}
+	
+	public void setWithdrawAmount(Integer amount) {
+		this.amount = amount;
+	}
 
-  public void setWithdrawAmount(Integer amount) {
-    this.amount = amount;
-  }
+	private void withdrawAmount(Integer amount) {
+		try (Socket puConnection = new Socket("localhost", Globals.atmToNetwork)) {
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(puConnection.getOutputStream()));
+			writer.write(amount.toString());
+		} catch (IOException e) {
+			// The connection failed.
+			System.out.println(e.getMessage());
+		} 
+	}
 
-  @Override
-  public void run() {
-    if (account == null || amount == null) {
-      return;
-    }
-    ProcessingUnit pu = new ProcessingUnit(this.account);
-    pu.setWithdrawAmount(amount);
-    pu.start();
-    try {
-      pu.join();
-      if (pu.hasFailed()) {
-        System.out.println("atm fail");
-      } else {
-        System.out.println("atm success");
-      }
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-  }
+	@Override
+	public void run() {
+		if (account == null || amount == null) {
+			return;
+		}
+
+		withdrawAmount(this.amount);
+	}
 }
