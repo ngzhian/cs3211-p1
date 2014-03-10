@@ -1,5 +1,7 @@
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
@@ -8,7 +10,25 @@ public class Atm extends Thread {
 	Integer amount;
 
 	public void login(Integer account) {
-		this.account = account;
+		System.out.println("Loging in...");
+		try (Socket authConnection = new Socket("localhost", Globals.atmToAuthNetwork)){
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(authConnection.getOutputStream()));
+			writer.write(account);
+			BufferedReader reply = new BufferedReader(new InputStreamReader(authConnection.getInputStream()));
+			boolean isSuccess = reply.readLine().equals("success");
+			
+			if(isSuccess){
+				this.account = account;
+			} else{
+				System.out.println("Bad login details...");
+				return;
+			}
+			
+		} catch(IOException e){
+			// Connection failed
+			System.out.println("Login failed.. trying again");
+			login(account);
+		}
 	}
 	
 	public void setWithdrawAmount(Integer amount) {
