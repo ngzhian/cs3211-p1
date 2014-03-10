@@ -3,10 +3,50 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Atm extends Thread {
 	Integer account;
 	Integer amount;
+	
+	public static void main(String[] args){
+		Atm atm = new Atm();
+		atm.start();
+		
+		System.out.println("Welcome to ATM:");
+		System.out.println("Here are the possible commands");
+		System.out.println("1. login [account_id]");
+		System.out.println("2. withdraw [amount]");
+		System.out.println("3. exit");
+		
+		System.out.println("-------------------------------");
+		
+		Scanner sc = new Scanner(System.in);
+		while(sc.hasNext()){
+			String[] input = sc.nextLine().split(" ");
+			String command = input[0];
+			int param;
+			
+			switch(command){
+			case "login":
+				param = Integer.parseInt(input[1]);
+				atm.login(param);
+				break;
+			case "withdraw":
+				param = Integer.parseInt(input[1]);
+				atm.withdrawAmount(param);
+				break;
+			case "exit":
+				atm.interrupt();
+				try {
+					atm.join();
+				} catch (InterruptedException e) {
+				}
+				System.out.println("Exiting ATM...");
+				return;
+			}
+		}
+	}
 
 	public void login(Integer account) {
 		String outputPrefix = "ATM " + this.getId();
@@ -41,7 +81,11 @@ public class Atm extends Thread {
 		this.amount = amount;
 	}
 
-	private void withdrawAmount(Integer amount) {
+	public void withdrawAmount(Integer amount) {
+		if(account == null || amount == null){
+			System.out.println("Invalid withdrawal amount, or you may not be logged in");
+			return;
+		}
 		try (Socket connection = new Socket("localhost", Globals.atmToPuPort);
 				PrintWriter outToPu = new PrintWriter(connection.getOutputStream(), true);
 				BufferedReader inFromPu = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
@@ -63,7 +107,7 @@ public class Atm extends Thread {
 
 	@Override
 	public void run() {
-		if (account == null || amount == null) {
+		if (account == null || amount == null){
 			return;
 		}
 		withdrawAmount(this.amount);
