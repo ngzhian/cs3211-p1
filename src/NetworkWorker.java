@@ -23,8 +23,8 @@ public class NetworkWorker extends Thread {
 			inFromSender = new BufferedReader(new InputStreamReader(
 					this.socket.getInputStream()));
 		} catch (IOException e1) {
-			System.out.println("ERROR: Couldn't get input stream in worker. Halting.");
-			return;
+			System.out.println("CRITICAL ERROR: Couldn't get input stream in worker. Halting.");
+			throw new RuntimeException();
 		}
 
 		try (Socket sendTo = new Socket("localhost", this.sendPortNum)) {
