@@ -11,6 +11,7 @@ public class Globals {
 	static Random randomGenerator = new Random();
 	
 	static boolean isTimeout() {
-		return randomGenerator.nextInt(100) < reliability;
+		int nextInt = randomGenerator.nextInt(100);
+		return nextInt > reliability;
 	}
 }

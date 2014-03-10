@@ -33,8 +33,7 @@ public class Database extends Thread {
 		try (ServerSocket serverSocket = new ServerSocket(port)) {
 			while (true) {
 				Socket client = serverSocket.accept();
-				DatabaseThread dbthread = new DatabaseThread(client);
-				dbthread.start();
+				forkWorker(client);
 			}
 		} catch (IOException e) {
 			System.err.println("Could not listen on port " + port);
@@ -42,6 +41,11 @@ public class Database extends Thread {
 		}
 
 		System.out.println("Database exit");
+	}
+
+	private void forkWorker(Socket client) {
+		DatabaseThread dbthread = new DatabaseThread(client);
+		dbthread.start();
 	}
 
 	/*
@@ -90,15 +94,17 @@ class DatabaseThread extends Thread {
 		try (PrintWriter outToPu = new PrintWriter(socket.getOutputStream(), true);
 				BufferedReader inFromPu = new BufferedReader(new InputStreamReader(socket.getInputStream()));) {
 			if (Globals.isTimeout()) {
+				inFromPu.readLine();
 				outToPu.write("timeout");
-				return;
+				inFromPu.readLine();
+			} else {
+				String inputLine = inFromPu.readLine();
+				if (inputLine.contains("withdraw")) {
+					boolean success = Database.processWithdraw(inputLine);
+					outToPu.println(success ? "success" : "fail");
+				}
 			}
 
-			String inputLine = inFromPu.readLine();
-			if (inputLine.contains("withdraw")) {
-				boolean success = Database.processWithdraw(inputLine);
-				outToPu.println(success ? "success" : "fail");
-			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -33,20 +33,17 @@ class AuthServerThread extends Thread {
 
 	@Override
 	public void run() {
-		try (BufferedReader inFromClient = new BufferedReader(
-				new InputStreamReader(client.getInputStream()));
-				PrintWriter serverOut = new PrintWriter(
-						client.getOutputStream(), true);) {
-
-			boolean isTimeout = Globals.randomGenerator.nextInt(100) < Globals.reliability;
-			String message;
-			if (isTimeout) {
-				message = "timeout";
-			} else {
-				boolean isValid = Integer.parseInt(inFromClient.readLine()) < Globals.numberOfAccounts;
-				message = isValid ? "success" : "invalid account";
+		try (BufferedReader inFromAtm = new BufferedReader(new InputStreamReader(client.getInputStream()));
+				PrintWriter outToAtm = new PrintWriter(client.getOutputStream(), true);) {
+			if (Globals.isTimeout()) {
+				outToAtm.write("timeout");
+				return;
 			}
-			serverOut.println(message);
+
+			String message;
+			boolean isValid = Integer.parseInt(inFromAtm.readLine()) < Globals.numberOfAccounts;
+			message = isValid ? "success" : "invalid account";
+			outToAtm.println(message);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
