@@ -17,6 +17,7 @@ public class Network extends Thread {
 		this.randomGenerator = new Random();
 	}
 
+	@Override
 	public void run() {
 		try (ServerSocket receivePort = new ServerSocket(this.receivePortNum)) {
 			while (true) {
