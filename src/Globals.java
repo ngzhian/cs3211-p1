@@ -6,7 +6,7 @@ public class Globals {
 	static int accountNumber = 10;
 	
 	static int atmToAuthNetwork = 1232;
-	static int authNetworkToAtm = 1233;
+	static int authNetworkToAuthServer = 1233;
 	
 	static int atmToNetwork = 1234;
 	static int networkToPu = 1235;
