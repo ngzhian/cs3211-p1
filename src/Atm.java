@@ -9,7 +9,8 @@ public class Atm extends Thread {
 	Integer amount;
 
 	public void login(Integer account) {
-		System.out.println("Logging in...");
+		String outputPrefix = "ATM " + Thread.currentThread().getId();
+		System.out.println(outputPrefix + ": Logging in...");
 		try (Socket connection = new Socket("localhost", Globals.atmToAuthPort);
 				PrintWriter outToAuth = new PrintWriter(connection.getOutputStream(), true);
 				BufferedReader inFromAuth = new BufferedReader(new InputStreamReader(connection.getInputStream()));) {
@@ -20,17 +21,19 @@ public class Atm extends Thread {
 			case "timeout":
 				throw new IOException();
 			case "success":
-				System.out.println("Login successful.");
+				System.out.println(outputPrefix + ": Login successful.");
 				this.account = account;
 				break;
 			default:
-				System.out.println("Account does not exist!");
+				System.out.println(outputPrefix + ": Account does not exist!");
 				break;
 			}
 		} catch (IOException e) {
 			// Connection failed
-			System.out.println("Login failed.. trying again");
+			System.out.println(outputPrefix + ": Login failed. Retrying.");
 			login(account);
+		} catch (NullPointerException e) {
+			System.out.println("ATM " + Thread.currentThread().getId() + ": Deadlocked while logging in!");
 		}
 	}
 

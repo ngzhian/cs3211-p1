@@ -14,4 +14,7 @@ public class Globals {
 		int nextInt = randomGenerator.nextInt(100);
 		return nextInt > reliability;
 	}
+	
+	static boolean isUnsafe = false;
+	static boolean willDeadlock = false;
 }

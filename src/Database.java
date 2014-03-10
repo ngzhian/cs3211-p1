@@ -65,7 +65,28 @@ public class Database extends Thread {
 				.printf("DBThread %d gets current: %d has %d\n", Thread
 						.currentThread().getId(), account, Database
 						.getBalance(account));
-		// Thread.yield(); // can put this for more obvious concurrency issues
+		if (amount > currentBalance) {
+			return false;
+		}
+		int newBalance = currentBalance - amount;
+		Database.setBalance(account, newBalance);
+		System.out
+				.printf("DBThread %d gets set: %d has %d\n", Thread
+						.currentThread().getId(), account, Database
+						.getBalance(account));
+		return true;
+	}
+
+	public static boolean processUnsafeWithdraw(String input) {
+		String[] tokens = input.split(" ");
+		Integer account = Integer.parseInt(tokens[1]);
+		Integer amount = Integer.parseInt(tokens[2]);
+
+		int currentBalance = Database.getBalance(account);
+		System.out
+				.printf("DBThread %d gets current: %d has %d\n", Thread
+						.currentThread().getId(), account, Database
+						.getBalance(account));
 		if (amount > currentBalance) {
 			return false;
 		}
@@ -99,7 +120,12 @@ class DatabaseThread extends Thread {
 			} else {
 				String inputLine = inFromPu.readLine();
 				if (inputLine.contains("withdraw")) {
-					boolean success = Database.processWithdraw(inputLine);
+					boolean success;
+					if (Globals.isUnsafe) {
+						success = Database.processUnsafeWithdraw(inputLine);
+					} else {
+						success = Database.processWithdraw(inputLine);
+					}
 					outToPu.println(success ? "success" : "fail");
 				}
 			}
