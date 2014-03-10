@@ -32,7 +32,6 @@ public class Database extends Thread {
 		System.out.println("Database start : " + port);
 		try (ServerSocket serverSocket = new ServerSocket(port)) {
 			while (true) {
-				// starts a new thread to handle each client connection
 				Socket client = serverSocket.accept();
 				DatabaseThread dbthread = new DatabaseThread(client);
 				dbthread.start();
@@ -52,7 +51,7 @@ public class Database extends Thread {
 	 * @return true on successful withdraw, false on error, e.g. amount to
 	 * withdraw more than balance
 	 */
-	public synchronized static boolean processWithdraw(String input) {
+	public static boolean processWithdraw(String input) {
 		String[] tokens = input.split(" ");
 		Integer account = Integer.parseInt(tokens[1]);
 		Integer amount = Integer.parseInt(tokens[2]);
@@ -88,37 +87,17 @@ class DatabaseThread extends Thread {
 
 	@Override
 	public void run() {
-		System.out.println("Database thread start");
-		
-		try (Socket sendSocket = new Socket("localhost", Globals.dbToDbNetwork);
-			PrintWriter serverOut = new PrintWriter(sendSocket.getOutputStream(),
-				true);
-				BufferedReader inFromClient = new BufferedReader(
-						new InputStreamReader(socket.getInputStream()));) {
-			String inputLine;
-			while (inFromClient.ready()
-					&& (inputLine = inFromClient.readLine()) != null) {
-				// String inputLine;
-				// while ((inputLine = inFromClient.readLine()) != null) {
-				System.out.println("DB read: " + inputLine);
-				if (inputLine.equals("end")) {
-					// informs client to terminate session
-					serverOut.println("end");
-					
-					// Wait until the other side reads everything
-					long wait = System.currentTimeMillis() + 1000;
-					while (System.currentTimeMillis() < wait);
-					
-					break;
-				} else if (inputLine.contains("withdraw")) {
-					boolean success = Database.processWithdraw(inputLine);
-					// informs the client of the success message
-					serverOut.println(success ? "success" : "fail");
+		try (PrintWriter outToPu = new PrintWriter(socket.getOutputStream(), true);
+				BufferedReader inFromPu = new BufferedReader(new InputStreamReader(socket.getInputStream()));) {
+			if (Globals.isTimeout()) {
+				outToPu.write("timeout");
+				return;
+			}
 
-					// Wait until the other side reads everything
-					long wait = System.currentTimeMillis() + 1000;
-					while (System.currentTimeMillis() < wait);
-				}
+			String inputLine = inFromPu.readLine();
+			if (inputLine.contains("withdraw")) {
+				boolean success = Database.processWithdraw(inputLine);
+				outToPu.println(success ? "success" : "fail");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

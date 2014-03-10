@@ -9,4 +9,8 @@ public class Globals {
 	static int puToDbPort = 1002;
 	
 	static Random randomGenerator = new Random();
+	
+	static boolean isTimeout() {
+		return randomGenerator.nextInt(100) < reliability;
+	}
 }
