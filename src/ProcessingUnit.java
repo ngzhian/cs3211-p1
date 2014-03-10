@@ -5,13 +5,11 @@ import java.net.Socket;
 
 /*
  * What an Atm uses to access the accounts.
- * A processing unit communicates with the Database via Sockets
- * to fulfil the requests of the User (Atm).
  */
 public class ProcessingUnit extends Thread {
 	@Override
 	public void run() {
-		try (ServerSocket receive = new ServerSocket(Globals.puNetworkToPu)) {
+		try (ServerSocket receive = new ServerSocket(Globals.atmToPuPort)) {
 			while (true) {
 				Socket session = receive.accept();
 				forkWorker(session);

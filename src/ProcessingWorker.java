@@ -17,28 +17,25 @@ public class ProcessingWorker extends Thread {
 	}
 
 	private void handleRequest() {
-		BufferedReader requestReader;
-		try {
-			requestReader = new BufferedReader(new InputStreamReader(
-					this.socket.getInputStream()));
-		} catch (IOException e) {
-			System.out
-					.println("CRITICAL ERROR: Couldn't get input stream in Processing Unit.");
-			throw new RuntimeException();
-		}
-
-		try (Socket sendToDb = new Socket("localhost", Globals.puToDbNetwork);
-				BufferedReader responseFromDb = new BufferedReader(
-						new InputStreamReader(sendToDb.getInputStream()));
-				PrintWriter outToDb = new PrintWriter(
-						sendToDb.getOutputStream(), true)) {
-			String line;
-			while ((line = requestReader.readLine()) != null) {
-				outToDb.println(line);
+		try (
+				BufferedReader inFromAtm = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				PrintWriter outToAtm = new PrintWriter(socket.getOutputStream(), true);
+				Socket dbConnection = new Socket("localhost", Globals.puToDbPort);
+				BufferedReader inFromDb = new BufferedReader(new InputStreamReader(dbConnection.getInputStream()));
+				PrintWriter outToDb = new PrintWriter(dbConnection.getOutputStream(), true)
+				) {
+			if (Globals.isTimeout()) {
+				outToAtm.write("timeout");
+				return;
 			}
+			
+			String requestFromAtm = inFromAtm.readLine();
+			outToDb.write(requestFromAtm);
+			
+			String responseFromDb = inFromDb.readLine();
+			outToAtm.write(responseFromDb);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
 		}
 	}
 }
