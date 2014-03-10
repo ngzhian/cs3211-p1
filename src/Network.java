@@ -1,11 +1,6 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Random;
 
 public class Network extends Thread {
@@ -32,7 +27,8 @@ public class Network extends Thread {
 					dropConnection(receivedFrom);
 					continue;
 				} else {
-					forwardMessage(receivedFrom);
+					NetworkWorker worker = new NetworkWorker(receivedFrom, this.sendPortNum);
+					worker.start();
 				}
 			}
 		} catch (IOException e) {
@@ -42,22 +38,5 @@ public class Network extends Thread {
 	
 	private void dropConnection(Socket receivedFrom) throws IOException {
 		receivedFrom.close();
-	}
-
-	private void forwardMessage(Socket receivedFrom) throws IOException,
-			UnknownHostException {
-		BufferedReader inFromSender = new BufferedReader(
-				new InputStreamReader(receivedFrom.getInputStream()));
-
-		try (Socket sendTo = new Socket("localhost",
-				this.sendPortNum)) {
-			BufferedWriter outToReceiver = new BufferedWriter(
-					new OutputStreamWriter(sendTo.getOutputStream()));
-
-			String lineFromSender;
-			while ((lineFromSender = inFromSender.readLine()) != null) {
-				outToReceiver.write(lineFromSender);
-			}
-		}
 	}
 }
