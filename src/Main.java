@@ -18,8 +18,8 @@ public class Main {
     Atm first = new Atm();
     Atm second = new Atm();
 
-    first.login(0);
-    second.login(0);
+    // first.login(0);
+    // second.login(0);
     first.account = 0;
     second.account = 0;
 
