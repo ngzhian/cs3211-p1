@@ -33,11 +33,10 @@ public class NetworkWorker extends Thread {
 
       String lineFromSender;
       while ((lineFromSender = inFromSender.readLine()) != null) {
-        System.out.println(lineFromSender);
         outToReceiver.println(lineFromSender);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+    	e.printStackTrace();
     }
   }
 }

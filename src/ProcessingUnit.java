@@ -11,7 +11,7 @@ import java.net.Socket;
 public class ProcessingUnit extends Thread {
 	@Override
 	public void run() {
-		try (ServerSocket receive = new ServerSocket(Globals.networkToPu)) {
+		try (ServerSocket receive = new ServerSocket(Globals.puNetworkToPu)) {
 			while (true) {
 				Socket session = receive.accept();
 				forkWorker(session);

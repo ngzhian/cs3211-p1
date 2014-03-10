@@ -27,7 +27,7 @@ public class ProcessingWorker extends Thread {
 			throw new RuntimeException();
 		}
 
-		try (Socket sendToDb = new Socket("localhost", Globals.puToNetwork);
+		try (Socket sendToDb = new Socket("localhost", Globals.puToDbNetwork);
 				BufferedReader responseFromDb = new BufferedReader(
 						new InputStreamReader(sendToDb.getInputStream()));
 				PrintWriter outToDb = new PrintWriter(

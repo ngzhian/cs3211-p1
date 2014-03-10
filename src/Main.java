@@ -18,10 +18,8 @@ public class Main {
     Atm first = new Atm();
     Atm second = new Atm();
 
-    // first.login(0);
-    // second.login(0);
-    first.account = 0;
-    second.account = 0;
+    first.login(0);
+    second.login(0);
 
     Integer withdrawA = 30;
     Integer withdrawB = 40;
@@ -49,7 +47,7 @@ public class Main {
   }
 
   private static void setUpDatabase() {
-    Database db = new Database(Globals.networkToDb, 2);
+    Database db = new Database(Globals.dbNetworkToDb, 2);
     Database.setDefaultBalance();
     db.start();
   }
@@ -57,12 +55,19 @@ public class Main {
   private static void setUpNetwork(int reliability) {
     Network atmToAuth = new Network(Globals.atmToAuthNetwork,
         Globals.authNetworkToAuthServer, reliability);
-    Network atmToPu = new Network(Globals.atmToNetwork, Globals.networkToPu,
+    Network authToAtm = new Network(Globals.authServerToAuthNetwork, Globals.authNetworkToAtm, reliability);
+    Network atmToPu = new Network(Globals.atmToPuNetwork, Globals.puNetworkToPu,
         reliability);
-    Network puToDb = new Network(Globals.puToNetwork, Globals.networkToDb,
+    Network puToAtm = new Network(Globals.puToPuNetwork, Globals.puNetworkToAtm, reliability);
+    Network puToDb = new Network(Globals.puToDbNetwork, Globals.dbNetworkToDb,
         reliability);
+    Network dbToPu = new Network(Globals.dbToDbNetwork, Globals.dbNetworkToPu, reliability);
+    
     atmToAuth.start();
+    authToAtm.start();
     atmToPu.start();
+    puToAtm.start();
     puToDb.start();
+    dbToPu.start();
   }
 }

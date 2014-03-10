@@ -26,25 +26,28 @@ public class AuthServer extends Thread {
 }
 
 class AuthServerThread extends Thread {
-  private Socket socket;
+	private Socket receiveSocket;
 
-  public AuthServerThread(Socket socket) {
-    this.socket = socket;
-  }
+	public AuthServerThread(Socket socket) {
+		this.receiveSocket = socket;
+	}
 
-  @Override
-  public void run() {
-    try (PrintWriter serverOut = new PrintWriter(socket.getOutputStream(), true);
-        BufferedReader inFromClient = new BufferedReader(new InputStreamReader(
-            socket.getInputStream()));) {
-
-      String inputLine = inFromClient.readLine();
-      System.out.println("AUTHSERVER " + inputLine);
-      boolean isValid = Integer.parseInt(inputLine) < Globals.accountNumber;
-      String message = isValid ? "success" : "invalid account";
-      serverOut.println(message);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
+	@Override
+	public void run() {
+		try (BufferedReader inFromClient = new BufferedReader(new InputStreamReader(receiveSocket.getInputStream()));
+			 Socket sendSocket = new Socket("localhost", Globals.authServerToAuthNetwork);
+			 PrintWriter serverOut = new PrintWriter(sendSocket.getOutputStream(),true);) {
+			
+			boolean isValid = Integer.parseInt(inFromClient.readLine()) < Globals.accountNumber;
+			String message = isValid ? "success" : "invalid account";
+			serverOut.println(message);
+			
+			//Wait until the other side reads everything
+			long wait = System.currentTimeMillis() + 1000;
+			while(System.currentTimeMillis() < wait);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
